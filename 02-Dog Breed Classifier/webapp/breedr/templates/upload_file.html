@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block body %}
+<script src="https://transloadit.edgly.net/releases/uppy/v0.22.0/dist/uppy.min.js"></script>
+
+
+<div class="UppyDragDrop"></div>
+
+<script>
+
+const uppy = Uppy.Core({
+  debug: true,
+  autoProceed: false,
+  restrictions: {
+    maxFileSize: 1000000,
+    maxNumberOfFiles: 1,
+    minNumberOfFiles: 1,
+    allowedFileTypes: ['image/*']
+  }
+})
+uppy.use(Uppy.Dashboard, {
+  inline: true,
+  target: '.UppyDragDrop',
+  replaceTargetContent: true,
+  note: 'Images only',
+  maxHeight: 450,
+  metaFields: [
+    { id: 'license', name: 'License', placeholder: 'specify license' },
+    { id: 'caption', name: 'Caption', placeholder: 'describe what the image is about' }
+  ]
+})
+uppy.use(Uppy.Webcam, {
+  target: Uppy.Dashboard,
+  modes: ['picture'],
+  locale: {
+    strings: {
+      smile: 'Take a picture!'
+    }
+  }
+})
+uppy.use(Uppy.XHRUpload, {
+  endpoint: 'http://localhost:5000/upload',
+  method: 'post',
+  formData: true,
+  fieldName: 'file'
+})
+
+uppy.on('upload-success', (fileId, resp, uploadURL) => {
+  const url = "/show_breed/" + resp["id"];
+  window.location = url
+})
+
+uppy.on('complete', result => {
+})
+</script>
+
+{% endblock %}

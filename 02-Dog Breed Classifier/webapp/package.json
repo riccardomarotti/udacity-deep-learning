@@ -1,0 +1,9 @@
+{
+  "name": "breedr",
+  "version": "1.0.0",
+  "description": "",
+
+  "dependencies": {
+    "uppy": "^0.22.2"
+  }
+}

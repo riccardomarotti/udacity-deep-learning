@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Breedr</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://transloadit.edgly.net/releases/uppy/v0.22.0/dist/uppy.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class=page>
+      <h1>Breedr</h1>
+      <div class=metanav>
+        {% block body %}{% endblock %}
+      </div>
+    </div>
+  </body>
+</html>

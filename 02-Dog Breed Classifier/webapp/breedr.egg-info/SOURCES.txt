@@ -1,0 +1,8 @@
+MANIFEST.in
+breedr/__init__.py
+breedr/breed.py
+breedr.egg-info/PKG-INFO
+breedr.egg-info/SOURCES.txt
+breedr.egg-info/dependency_links.txt
+breedr.egg-info/requires.txt
+breedr.egg-info/top_level.txt
