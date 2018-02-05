@@ -1,1 +1,7 @@
 Flask
+python-resize-image
+tensorflow
+Keras
+numpy
+tqdm
+opencv-python
