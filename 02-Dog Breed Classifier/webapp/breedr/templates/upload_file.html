@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-<script src="https://transloadit.edgly.net/releases/uppy/v0.22.0/dist/uppy.min.js"></script>
+<script src="{{ url_for('static', filename='uppy.min.js') }}"></script>
 
 
 <div class="UppyDragDrop"></div>
