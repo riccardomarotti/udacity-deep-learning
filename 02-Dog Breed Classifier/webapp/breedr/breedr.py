@@ -1,9 +1,9 @@
 import os, uuid, tempfile, base64, urllib.parse
 from .ai import Brain
-from PIL import Image
-from resizeimage import resizeimage
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, jsonify
+
+from subprocess import call
 
 
 app = Flask(__name__)
@@ -35,7 +35,12 @@ def show_breed(id):
 def upload():
     file = request.files['file']
     filename = str(uuid.uuid4())
-    file.save(os.path.join(tempdir, filename))
+    full_local_filename = os.path.join(tempdir, filename)
+    file.save(full_local_filename)
+
+    call(["mogrify", "-resize", "100000@", full_local_filename])
+
+
 
     data = {"id": filename}
     return jsonify(data)
