@@ -152,7 +152,7 @@ class Brain:
         self.model.load_weights(weights_file)
 
         self.ResNet50_model = ResNet50(weights='imagenet')
-        self.detector = face_cascade = cv2.CascadeClassifier('haarcascades/haarcascade_frontalface_alt.xml')
+        self.face_detector = cv2.CascadeClassifier('haarcascades/haarcascade_frontalface_alt.xml')
 
 
     def predict_breed(self, img_path):
@@ -185,7 +185,7 @@ class Brain:
     def detect_face(self, img_path):
         img = cv2.imread(img_path)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        faces = self.detector.detectMultiScale(gray)
+        faces = self.face_detector.detectMultiScale(gray)
         return len(faces) > 0
 
 
