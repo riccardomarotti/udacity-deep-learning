@@ -22,10 +22,11 @@ const uppy = Uppy.Core({
     allowedFileTypes: ['image/*']
   }
 })
-uppy.use(Uppy.Dashboard, {
+.use(Uppy.Dashboard, {
   inline: true,
   target: '.UppyDragDrop',
   replaceTargetContent: true,
+  trigger: '.UppyModalOpenerBtn',
   note: 'Images only',
   maxHeight: 450,
   metaFields: [
@@ -33,7 +34,7 @@ uppy.use(Uppy.Dashboard, {
     { id: 'caption', name: 'Caption', placeholder: 'describe what the image is about' }
   ]
 })
-uppy.use(Uppy.Webcam, {
+.use(Uppy.Webcam, {
   target: Uppy.Dashboard,
   modes: ['picture'],
   locale: {
@@ -42,12 +43,12 @@ uppy.use(Uppy.Webcam, {
     }
   }
 })
-uppy.use(Uppy.XHRUpload, {
+.use(Uppy.XHRUpload, {
   endpoint: '/upload',
   method: 'post',
   formData: true,
   fieldName: 'file'
-})
+}).run()
 
 uppy.on('upload-success', (fileId, resp, uploadURL) => {
   const url = "/show_breed/" + resp["id"];
