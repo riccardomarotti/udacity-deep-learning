@@ -52,9 +52,9 @@ def upload():
     data = {"id": filename}
     return jsonify(data)
 
-def duckduck_query_for(breed):
+def duckduck_query_for(breed, fixed_words=["dog"]):
     if breed:
-        query = "+".join(breed.split())
+        query = "+".join(breed.split() + fixed_words)
         return "https://duckduckgo.com/?q={}&iax=images&ia=images".format(query)
 
     return None
