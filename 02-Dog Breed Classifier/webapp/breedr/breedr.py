@@ -17,6 +17,7 @@ app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 tempdir = tempfile.gettempdir()
 brain = Brain('saved_models/weights.best.xception.hdf5')
 
+
 @app.route('/')
 def upload_image():
     return render_template('upload_file.html')
@@ -44,10 +45,9 @@ def upload():
     filename = str(uuid.uuid4())
     full_local_filename = os.path.join(tempdir, filename)
     file.save(full_local_filename)
+    file.close()
 
     call(["mogrify", "-resize", "100000@", full_local_filename])
-
-
 
     data = {"id": filename}
     return jsonify(data)
