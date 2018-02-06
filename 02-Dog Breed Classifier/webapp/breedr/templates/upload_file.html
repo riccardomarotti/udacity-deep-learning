@@ -2,13 +2,17 @@
 {% block body %}
 <script src="{{ url_for('static', filename='uppy.min.js') }}"></script>
 
-<div>
-  Upload a picture of a dog, and I will tell you the breed.
+<div id="main">
+  <p>
+    Upload a picture of a dog, and I will tell you the breed.
+  </p>
+  <p>
+    If tou upload a portrait of a person, I will tell you the best matching dog breed.
+  </p>
+  <div class="UppyDragDrop"></div>
 </div>
-<div>
-  If tou upload a portrait of a person, I will tell you the best matching dog breed.
-</div>
-<div class="UppyDragDrop"></div>
+
+<div style="display:none;" id="loader"></div>
 
 <script>
 
@@ -51,6 +55,9 @@ const uppy = Uppy.Core({
 }).run()
 
 uppy.on('upload-success', (fileId, resp, uploadURL) => {
+  document.getElementById("main").style.display = "none";
+  document.getElementById("loader").style.display = "block";
+
   const url = "/show_breed/" + resp["id"];
   window.location = url
 })
