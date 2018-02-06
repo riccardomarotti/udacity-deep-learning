@@ -15,7 +15,7 @@ app.config.update(dict(
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 tempdir = tempfile.gettempdir()
-brain = Brain()
+brain = Brain('saved_models/weights.best.xception.hdf5')
 
 @app.route('/')
 def upload_image():

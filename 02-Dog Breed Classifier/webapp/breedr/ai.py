@@ -145,11 +145,11 @@ dog_names = [
 ]
 
 class Brain:
-    def __init__(self):
+    def __init__(self, weights_file):
         self.model = Sequential()
         self.model.add(GlobalAveragePooling2D(input_shape=(7, 7, 2048)))
         self.model.add(Dense(133, activation='softmax'))
-        self.model.load_weights('saved_models/weights.best.xception.hdf5')
+        self.model.load_weights(weights_file)
 
         self.ResNet50_model = ResNet50(weights='imagenet')
         self.detector = face_cascade = cv2.CascadeClassifier('haarcascades/haarcascade_frontalface_alt.xml')
