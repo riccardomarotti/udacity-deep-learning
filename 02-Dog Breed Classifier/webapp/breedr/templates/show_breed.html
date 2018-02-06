@@ -2,4 +2,11 @@
 {% block body %}
 <div>{{ detected_breed }}</div>
 <img src="data:image/*;base64,{{ image_data | safe }}" alt="breed"/>
+
+<div>
+  This picture has been (or will soon be) deleted from this machine.
+</div>
+<div>
+  <a href="{{ url_for('upload_image') }}">Try again!</a>
+</div>
 {% endblock %}

@@ -23,11 +23,16 @@ def upload_image():
 
 @app.route('/show_breed/<id>')
 def show_breed(id):
-    with open(os.path.join(tempdir, id), mode='rb') as file:
+    full_local_filename = os.path.join(tempdir, id)
+
+    if not os.path.isfile(full_local_filename):
+        return render_template('image_not_present.html')
+
+    with open(full_local_filename, mode='rb') as file:
         image_data = urllib.parse.quote(base64.b64encode(file.read()))
 
-    detected_breed = brain.find_breed(os.path.join(tempdir, id))
-
+    detected_breed = brain.find_breed(full_local_filename)
+    os.remove(full_local_filename)
 
     return render_template('show_breed.html', image_data=image_data, detected_breed=detected_breed)
 
