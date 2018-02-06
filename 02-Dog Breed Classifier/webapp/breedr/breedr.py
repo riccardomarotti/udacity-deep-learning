@@ -31,10 +31,12 @@ def show_breed(id):
     with open(full_local_filename, mode='rb') as file:
         image_data = urllib.parse.quote(base64.b64encode(file.read()))
 
-    detected_breed = brain.find_breed(full_local_filename)
+    message, breed = brain.find_breed(full_local_filename)
+    query = duckduck_query_for(breed)
+
     os.remove(full_local_filename)
 
-    return render_template('show_breed.html', image_data=image_data, detected_breed=detected_breed)
+    return render_template('show_breed.html', image_data=image_data, message=message, query=query, breed=breed)
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -49,3 +51,10 @@ def upload():
 
     data = {"id": filename}
     return jsonify(data)
+
+def duckduck_query_for(breed):
+    if breed:
+        query = "+".join(breed.split())
+        return "https://duckduckgo.com/?q={}&iax=images&ia=images".format(query)
+
+    return None

@@ -194,12 +194,13 @@ class Brain:
         is_dog = self.detect_dog(image_path)
 
         output = "No humans nor dogs found..."
+        breed = None
 
         if is_human:
-            output = "This human looks like a {}"
+            output = "This human looks like a "
+            breed = self.predict_breed(image_path)
         elif is_dog:
-            output = "This dog is a {}"
+            output = "This dog is a "
+            breed = self.predict_breed(image_path)
 
-        output = output.format(self.predict_breed(image_path))
-
-        return output
+        return output, breed

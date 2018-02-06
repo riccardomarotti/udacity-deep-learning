@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
 {% block body %}
-<div>{{ detected_breed }}</div>
+<div>
+  {{ message }}
+  {% if breed %}
+    <a href="{{ query }}">{{ breed }}</a>
+  {% endif %}
+</div>
 <img src="data:image/*;base64,{{ image_data | safe }}" alt="breed"/>
 
 <div>
