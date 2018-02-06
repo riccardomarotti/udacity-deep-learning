@@ -1,4 +1,4 @@
 {% extends "layout.html" %}
 {% block body %}
-<img src="{{ url_for('static', filename='uppy.min.js') }}"/>
+<img src="{{ url_for('static', filename='uppy.min.js') | autoversion}}"/>
 {% endblock %}

@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-<script src="{{ url_for('static', filename='uppy.min.js') }}"></script>
+<script src="{{ url_for('static', filename='uppy.min.js') | autoversion }}"></script>
 
 <div id="main">
   <p>
@@ -16,7 +16,7 @@
 
 <script>
 
-new Image().src="{{ url_for('static', filename='loading.svg') }}";
+new Image().src="{{ url_for('static', filename='loading.svg') | autoversion}}";
 
 const uppy = Uppy.Core({
   debug: true,

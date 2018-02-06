@@ -18,6 +18,18 @@ tempdir = tempfile.gettempdir()
 brain = Brain('saved_models/weights.best.xception.hdf5')
 
 
+@app.template_filter('autoversion')
+def autoversion_filter(filename):
+    fullpath = os.path.join('breedr/', filename[1:])
+    try:
+        timestamp = str(os.path.getmtime(fullpath))
+    except OSError:
+        return filename
+
+    newfilename = "{0}?v={1}".format(filename, timestamp)
+    return newfilename
+
+
 @app.route('/')
 def upload_image():
     return render_template('upload_file.html')
