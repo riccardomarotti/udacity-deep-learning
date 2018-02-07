@@ -2,6 +2,8 @@ from keras.applications.resnet50 import preprocess_input, decode_predictions, Re
 from keras.preprocessing import image
 from keras.models import Sequential
 from keras.layers import Dense, GlobalAveragePooling2D
+from keras.applications.xception import Xception
+from keras.applications.xception import preprocess_input as xception_preprocess_input
 from tqdm import tqdm
 import cv2
 import numpy as np
@@ -153,10 +155,11 @@ class Brain:
 
         self.ResNet50_model = ResNet50(weights='imagenet')
         self.face_detector = cv2.CascadeClassifier('haarcascades/haarcascade_frontalface_alt.xml')
+        self.xception = Xception(weights='imagenet', include_top=False)
 
 
     def predict_breed(self, img_path):
-        bottleneck_feature = extract_Xception(self.path_to_tensor(img_path))
+        bottleneck_feature = extract(self.path_to_tensor(img_path), self.xception, xception_preprocess_input)
         predicted_vector = self.model.predict(bottleneck_feature)
         return dog_names[np.argmax(predicted_vector)]
 
