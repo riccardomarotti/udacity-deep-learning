@@ -1,4 +1,4 @@
-import os, uuid, tempfile, base64, urllib.parse
+import os, uuid, tempfile, base64, urllib.parse, imghdr
 from .ai import Brain
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, jsonify
@@ -55,6 +55,10 @@ def show_breed(id):
 @app.route('/upload', methods=['POST'])
 def upload():
     file = request.files['file']
+
+    if not imghdr.what(file):
+        return ''
+
     filename = str(uuid.uuid4())
     full_local_filename = os.path.join(tempdir, filename)
     file.save(full_local_filename)
