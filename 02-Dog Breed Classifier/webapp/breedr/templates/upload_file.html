@@ -19,7 +19,7 @@
 new Image().src="{{ url_for('static', filename='loading.svg') | autoversion}}";
 
 const uppy = Uppy.Core({
-  debug: true,
+  debug: false,
   autoProceed: false,
   restrictions: {
     maxFileSize: 5000000,
