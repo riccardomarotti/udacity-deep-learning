@@ -10,7 +10,6 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 app.config.update(dict(
-    WEIGHTS_FILE='test.h5',
     MAX_CONTENT_LENGTH=5*1024*1024 #5MB
 ))
 
