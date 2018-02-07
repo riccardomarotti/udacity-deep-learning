@@ -6,12 +6,12 @@
     <a href="{{ query }}">{{ breed }}</a>
   {% endif %}
 </div>
-<img src="data:image/*;base64,{{ image_data | safe }}" alt="breed"/>
+<img src="data:image/*;base64,{{ image_data | safe }}" alt="breed" />
 
 <div>
-  This picture has been (or will soon be) deleted from this machine.
+  This picture has been deleted from this machine.
 </div>
 <div>
-  <a href="{{ url_for('upload_image') }}">Try again!</a>
+  <a href="{{ url_for('upload_image') }}" class="button is-link">Again!</a>
 </div>
 {% endblock %}

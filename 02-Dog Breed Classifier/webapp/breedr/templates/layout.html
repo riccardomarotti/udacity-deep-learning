@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Breedr</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>breedr</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bulma.css') | autoversion}}">
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') | autoversion}}">
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='uppy.min.css') | autoversion}}">
     <link rel="shortcut icon"  href="{{ url_for('static', filename='favicon.ico') | autoversion}}">
   </head>
   <body>
-    <div class=page>
-      <h1>Breedr</h1>
-      <div class=metanav>
-        {% block body %}{% endblock %}
+    <section class="section">
+       <div class="container">
+        <h1 class="title">breedr</h1>
+        <p class="subtitle">
+          a dog breed detector
+        </p>
+
+        {% block body %}
+        {% endblock %}
+
       </div>
-    </div>
+    </section>
   </body>
 </html>

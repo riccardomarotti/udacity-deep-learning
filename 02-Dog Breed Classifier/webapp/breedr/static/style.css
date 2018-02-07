@@ -1,7 +1,7 @@
 #main {
 }
 
-#loader {
+#spinner {
   border-top: 16px solid #f3f3f3;
   border-right: 16px solid #b3b3b3;
   border-bottom: 16px solid #1365a9;
@@ -10,6 +10,16 @@
   width: 120px;
   height: 120px;
   animation: spin 2s linear infinite;
+}
+#loader {
+  position: relative;
+}
+#loader .waiting-message {
+  text-align: center;
+  position: absolute;
+  width: 5em;
+  top: 2em;
+  left: 1.1em;
 }
 
 @-webkit-keyframes spin {
