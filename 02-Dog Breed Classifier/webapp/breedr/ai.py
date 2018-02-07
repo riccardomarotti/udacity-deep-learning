@@ -8,7 +8,6 @@ from tqdm import tqdm
 import cv2
 import numpy as np
 
-from .extract_bottleneck_features import *
 
 dog_names = [
     "Affenpinscher",
@@ -159,7 +158,7 @@ class Brain:
 
 
     def predict_breed(self, img_path):
-        bottleneck_feature = extract(self.path_to_tensor(img_path), self.xception, xception_preprocess_input)
+        bottleneck_feature = self.xception.predict(xception_preprocess_input(self.path_to_tensor(img_path)))
         predicted_vector = self.model.predict(bottleneck_feature)
         return dog_names[np.argmax(predicted_vector)]
 
