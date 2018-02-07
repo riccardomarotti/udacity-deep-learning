@@ -10,8 +10,10 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 app.config.update(dict(
-    WEIGHTS_FILE='test.h5'
+    WEIGHTS_FILE='test.h5',
+    MAX_CONTENT_LENGTH=50*1024 #5MB
 ))
+
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 tempdir = tempfile.gettempdir()
