@@ -6,7 +6,7 @@ from tqdm import tqdm
 import cv2
 import numpy as np
 
-from extract_bottleneck_features import *
+from .extract_bottleneck_features import *
 
 dog_names = [
     "Affenpinscher",
