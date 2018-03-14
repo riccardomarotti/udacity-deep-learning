@@ -216,7 +216,7 @@ class Dataset(object):
 
             current_index += batch_size
 
-            yield data_batch / IMAGE_MAX_VALUE - 0.5
+            yield (data_batch / IMAGE_MAX_VALUE) * 2 - 1
 
 
 class DLProgress(tqdm):
