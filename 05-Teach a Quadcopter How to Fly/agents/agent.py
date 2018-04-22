@@ -8,7 +8,7 @@ from collections import namedtuple, deque
 
 class DDPG():
     """Reinforcement Learning agent that learns using DDPG."""
-    def __init__(self, task):
+    def __init__(self, task, parameters):
         self.task = task
         self.state_size = task.state_size
         self.action_size = task.action_size
@@ -28,23 +28,24 @@ class DDPG():
         self.actor_target.model.set_weights(self.actor_local.model.get_weights())
 
         # Noise process
-        self.exploration_mu = 0
-        self.exploration_theta = 0.15
-        self.exploration_sigma = 0.2
+        self.exploration_mu = parameters['exploration_mu']
+        self.exploration_theta = parameters['exploration_theta']
+        self.exploration_sigma = parameters['exploration_sigma']
         self.noise = OUNoise(self.action_size, self.exploration_mu, self.exploration_theta, self.exploration_sigma)
 
         # Replay memory
-        self.buffer_size = 100000
-        self.batch_size = 64
+        self.buffer_size = parameters['buffer_size']
+        self.batch_size = parameters['batch_size']
         self.memory = ReplayBuffer(self.buffer_size, self.batch_size)
 
         # Algorithm parameters
-        self.gamma = 0.99  # discount factor
-        self.tau = 0.01  # for soft update of target parameters
+        self.gamma = parameters['gamma']  # discount factor
+        self.tau = parameters['tau']  # for soft update of target parameters
 
-        self.best_score = -np.inf
+        self.explore = True
 
-    def reset_episode(self):
+    def reset_episode(self, explore=True):
+        self.explore = explore
         self.noise.reset()
         state = self.task.reset()
         self.last_state = state
@@ -66,7 +67,11 @@ class DDPG():
         """Returns actions for given state(s) as per current policy."""
         state = np.reshape(state, [-1, self.state_size])
         action = self.actor_local.model.predict(state)[0]
-        return list(action + self.noise.sample())  # add some noise for exploration
+        noise = 0
+        if self.explore:
+            noise = self.noise.sample()
+
+        return list(action + noise)  # add some noise for exploration
 
     def learn(self, experiences):
         """Update policy and value parameters using given batch of experience tuples."""

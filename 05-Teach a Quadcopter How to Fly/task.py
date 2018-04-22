@@ -1,9 +1,13 @@
 import numpy as np
 from physics_sim import PhysicsSim
+import math
+
+def sigmoid(x):
+    return 1. / (1. + math.exp(-x))
 
 class Task():
     """Task (environment) that defines the goal and provides feedback to the agent."""
-    def __init__(self, init_pose=None, init_velocities=None,
+    def __init__(self, init_pose, init_velocities=None,
         init_angle_velocities=None, runtime=5., target_pos=None):
         """Initialize a Task object.
         Params
@@ -16,39 +20,43 @@ class Task():
         """
         # Simulation
         self.sim = PhysicsSim(init_pose, init_velocities, init_angle_velocities, runtime)
-        self.action_repeat = 10
+        self.action_repeat = 1
 
         self.state_size = self.action_repeat * 6
         self.action_low = 0
         self.action_high = 900
         self.action_size = 4
 
+        self.last_rotor_speeds = []
         # Goal
-        self.target_pos = target_pos if target_pos is not None else np.array([0., 0., 10.])
+        self.target_pos = target_pos if target_pos is not None else np.array([0., 0., 0.])
 
     def get_reward(self):
         """Uses current pose of sim to return reward."""
         reward = 10.
 
-        for malus in self.sim.pose:
-            reward -= abs(malus)
+        reward -= abs(self.sim.v[:2]).sum() # x, y velocities must be 0
+        reward -= abs(self.sim.v[2]) # penalize z velocity
+        reward -= abs(self.sim.angular_v).sum() # angular velocities must be 0
+        reward -= abs(self.sim.pose[3:]).sum() # euler angles must be 0
 
-        reward -= abs(self.sim.v[0])
-        reward -= abs(self.sim.v[1])
+        reward -= abs(self.sim.linear_accel[2])
 
-        for malus in self.sim.angular_v:
-            reward -= abs(malus)
+        reward -= abs(self.target_pos[2] - self.sim.pose[2]) * 2
 
-        reward -= abs(self.sim.linear_accel[0])
-        reward -= abs(self.sim.linear_accel[1])
+        # reward -= np.var(self.last_rotor_speeds)
 
-        for malus in self.sim.angular_accels:
-            reward -= abs(malus)
+        # print("V = {}".format(self.sim.v[2]))
+        # print("R = {}".format(abs(self.sim.v[2]) * factor))
+        # print("H = {}".format(self.sim.pose[2]))
 
+        # distance = np.linalg.norm(abs(self.sim.pose[:3] - self.target_pos))
+        # reward = np.tanh(1 - 0.006*(distance))
         return reward
 
     def step(self, rotor_speeds):
         """Uses action to obtain next state, reward, done."""
+        self.last_rotor_speeds = rotor_speeds
         reward = 0
         pose_all = []
         for _ in range(self.action_repeat):
