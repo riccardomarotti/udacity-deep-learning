@@ -33,18 +33,18 @@ class Task():
 
     def get_reward(self):
         """Uses current pose of sim to return reward."""
-        reward = 10.
+        reward = 0.
 
-        reward -= abs(self.sim.v[:2]).sum() # x, y velocities must be 0
-        reward -= abs(self.sim.v[2]) # penalize z velocity
-        reward -= abs(self.sim.angular_v).sum() # angular velocities must be 0
-        reward -= abs(self.sim.pose[3:]).sum() # euler angles must be 0
+        reward -= (self.sim.v).sum() ** 2 # velocities must be 0
 
-        reward -= abs(self.sim.linear_accel[2])
+        # reward -= abs(self.target_pos - self.sim.pose[:3]).sum()
+        # reward -= abs(self.sim.pose[3:]).sum() # euler angles must be 0
+        # reward -= abs(self.sim.find_body_velocity()).sum() # velocities must be 0
+        reward -= (self.sim.angular_v).sum() ** 2 # angular velocities must be 0
+        reward -= (self.sim.linear_accel).sum() ** 2
+        reward -= (self.sim.angular_accels).sum() ** 2
 
-        reward -= abs(self.target_pos[2] - self.sim.pose[2]) * 2
-
-        # reward -= np.var(self.last_rotor_speeds)
+        # reward -= np.std(self.last_rotor_speeds)
 
         # print("V = {}".format(self.sim.v[2]))
         # print("R = {}".format(abs(self.sim.v[2]) * factor))

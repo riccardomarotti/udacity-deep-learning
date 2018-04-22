@@ -43,9 +43,11 @@ class DDPG():
         self.tau = parameters['tau']  # for soft update of target parameters
 
         self.explore = True
+        self.rewards = []
 
     def reset_episode(self, explore=True):
         self.explore = explore
+        self.rewards = []
         self.noise.reset()
         state = self.task.reset()
         self.last_state = state
@@ -60,6 +62,7 @@ class DDPG():
             experiences = self.memory.sample()
             self.learn(experiences)
 
+        self.rewards.append(reward)
         # Roll over last state and action
         self.last_state = next_state
 
@@ -109,6 +112,9 @@ class DDPG():
         new_weights = self.tau * local_weights + (1 - self.tau) * target_weights
         target_model.set_weights(new_weights)
 
+    def average_reward(self):
+        return np.mean(self.rewards)
+
 
 class Actor:
     """Actor (Policy) Model."""
@@ -140,8 +146,11 @@ class Actor:
 
         # Add hidden layers
         net = layers.Dense(units=32, activation='relu')(states)
+        net = layers.Dropout(.33)(net)
         net = layers.Dense(units=64, activation='relu')(net)
+        net = layers.Dropout(.33)(net)
         net = layers.Dense(units=32, activation='relu')(net)
+        net = layers.Dropout(.33)(net)
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
 
@@ -198,11 +207,15 @@ class Critic:
 
         # Add hidden layer(s) for state pathway
         net_states = layers.Dense(units=32, activation='relu')(states)
+        net_states = layers.Dropout(.33)(net_states)
         net_states = layers.Dense(units=64, activation='relu')(net_states)
+        net_states = layers.Dropout(.33)(net_states)
 
         # Add hidden layer(s) for action pathway
         net_actions = layers.Dense(units=32, activation='relu')(actions)
+        net_actions = layers.Dropout(.33)(net_actions)
         net_actions = layers.Dense(units=64, activation='relu')(net_actions)
+        net_actions = layers.Dropout(.33)(net_actions)
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
 
