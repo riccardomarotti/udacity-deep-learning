@@ -20,7 +20,7 @@ class Task():
         """
         # Simulation
         self.sim = PhysicsSim(init_pose, init_velocities, init_angle_velocities, runtime)
-        self.action_repeat = 1
+        self.action_repeat = 10
 
         self.state_size = self.action_repeat * 6
         self.action_low = 0
@@ -35,23 +35,20 @@ class Task():
         """Uses current pose of sim to return reward."""
         reward = 0.
 
-        reward -= (self.sim.v).sum() ** 2 # velocities must be 0
+        reward -= (self.sim.v ** 2).sum() / self.action_repeat  # velocities must be 0
 
-        # reward -= abs(self.target_pos - self.sim.pose[:3]).sum()
-        # reward -= abs(self.sim.pose[3:]).sum() # euler angles must be 0
         # reward -= abs(self.sim.find_body_velocity()).sum() # velocities must be 0
-        reward -= (self.sim.angular_v).sum() ** 2 # angular velocities must be 0
-        reward -= (self.sim.linear_accel).sum() ** 2
-        reward -= (self.sim.angular_accels).sum() ** 2
+        reward -= (self.sim.angular_v ** 2).sum() / self.action_repeat # angular velocities must be 0
+        # reward -= (self.sim.linear_accel ** 2).sum()
+        # reward -= (self.sim.angular_accels ** 2).sum()
 
         # reward -= np.std(self.last_rotor_speeds)
 
-        # print("V = {}".format(self.sim.v[2]))
-        # print("R = {}".format(abs(self.sim.v[2]) * factor))
-        # print("H = {}".format(self.sim.pose[2]))
-
         # distance = np.linalg.norm(abs(self.sim.pose[:3] - self.target_pos))
         # reward = np.tanh(1 - 0.006*(distance))
+
+        # dist = np.linalg.norm(np.array(self.sim.pose[:3]) - np.array(self.target_pos))
+        # reward = np.tanh(1.0 -.2*(dist))
         return reward
 
     def step(self, rotor_speeds):

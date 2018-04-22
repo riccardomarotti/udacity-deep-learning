@@ -1,4 +1,4 @@
-from keras import layers, models, optimizers
+from keras import layers, models, optimizers, regularizers
 from keras import backend as K
 import numpy as np
 import copy
@@ -146,11 +146,13 @@ class Actor:
 
         # Add hidden layers
         net = layers.Dense(units=32, activation='relu')(states)
-        net = layers.Dropout(.33)(net)
+        # net = layers.Dropout(.33)(net)
         net = layers.Dense(units=64, activation='relu')(net)
-        net = layers.Dropout(.33)(net)
+        # net = layers.Dropout(.33)(net)
+        net = layers.Dense(units=128, activation='relu')(net)
+        net = layers.Dense(units=64, activation='relu')(net)
         net = layers.Dense(units=32, activation='relu')(net)
-        net = layers.Dropout(.33)(net)
+        # net = layers.Dropout(.33)(net)
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
 
@@ -172,7 +174,7 @@ class Actor:
         # Incorporate any additional losses here (e.g. from regularizers)
 
         # Define optimizer and training function
-        optimizer = optimizers.Adam()
+        optimizer = optimizers.Adam(lr=0.0001)
         updates_op = optimizer.get_updates(params=self.model.trainable_weights, loss=loss)
         self.train_fn = K.function(
             inputs=[self.model.input, action_gradients, K.learning_phase()],
@@ -207,32 +209,35 @@ class Critic:
 
         # Add hidden layer(s) for state pathway
         net_states = layers.Dense(units=32, activation='relu')(states)
-        net_states = layers.Dropout(.33)(net_states)
+        # net_states = layers.Dropout(.33)(net_states)
         net_states = layers.Dense(units=64, activation='relu')(net_states)
-        net_states = layers.Dropout(.33)(net_states)
+        # net_states = layers.Dropout(.33)(net_states)
+        net_states = layers.BatchNormalization()(net_states)
 
         # Add hidden layer(s) for action pathway
         net_actions = layers.Dense(units=32, activation='relu')(actions)
-        net_actions = layers.Dropout(.33)(net_actions)
+        # net_actions = layers.Dropout(.33)(net_actions)
         net_actions = layers.Dense(units=64, activation='relu')(net_actions)
-        net_actions = layers.Dropout(.33)(net_actions)
+        # net_actions = layers.Dropout(.33)(net_actions)
+        net_actions = layers.BatchNormalization()(net_actions)
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
 
         # Combine state and action pathways
         net = layers.Add()([net_states, net_actions])
-        net = layers.Activation('relu')(net)
+        # net = layers.Activation('relu')(net)
+        net = layers.Dense(units=32, activation='relu')(net)
 
         # Add more layers to the combined network if needed
 
         # Add final output layer to prduce action values (Q values)
-        Q_values = layers.Dense(units=1, name='q_values')(net)
+        Q_values = layers.Dense(units=1, name='q_values', kernel_regularizer=regularizers.l2(0.001))(net)
 
         # Create Keras model
         self.model = models.Model(inputs=[states, actions], outputs=Q_values)
 
         # Define optimizer and compile model for training with built-in loss function
-        optimizer = optimizers.Adam()
+        optimizer = optimizers.Adam(lr=0.0001)
         self.model.compile(optimizer=optimizer, loss='mse')
 
         # Compute action gradients (derivative of Q values w.r.t. to actions)
