@@ -20,7 +20,7 @@ class Task():
         """
         # Simulation
         self.sim = PhysicsSim(init_pose, init_velocities, init_angle_velocities, runtime)
-        self.action_repeat = 10
+        self.action_repeat = 5
 
         self.state_size = self.action_repeat * 6
         self.action_low = 0
@@ -35,12 +35,13 @@ class Task():
         """Uses current pose of sim to return reward."""
         reward = 0.
 
-        reward -= (self.sim.v ** 2).sum() / self.action_repeat  # velocities must be 0
+        reward -= (self.sim.v ** 2).sum()  # velocities must be 0
 
-        # reward -= abs(self.sim.find_body_velocity()).sum() # velocities must be 0
-        reward -= (self.sim.angular_v ** 2).sum() / self.action_repeat # angular velocities must be 0
+        # reward -= (self.sim.find_body_velocity() ** 2).sum() # velocities must be 0
+        reward -= abs(self.sim.angular_v).sum() # angular velocities must be 0
         # reward -= (self.sim.linear_accel ** 2).sum()
         # reward -= (self.sim.angular_accels ** 2).sum()
+        # reward -= abs(self.sim.pose[:3] - self.target_pos).sum()
 
         # reward -= np.std(self.last_rotor_speeds)
 
@@ -49,7 +50,7 @@ class Task():
 
         # dist = np.linalg.norm(np.array(self.sim.pose[:3]) - np.array(self.target_pos))
         # reward = np.tanh(1.0 -.2*(dist))
-        return reward
+        return reward / self.action_repeat
 
     def step(self, rotor_speeds):
         """Uses action to obtain next state, reward, done."""
