@@ -31,17 +31,20 @@ class Task():
         # Goal
         self.target_pos = target_pos if target_pos is not None else np.array([0., 0., 0.])
 
+
     def get_reward(self):
         """Uses current pose of sim to return reward."""
-        # reward = 0.
+        # reward = 0
 
-        # reward -= (self.sim.v ** 2).sum()  # velocities must be 0
+        # reward -= np.linalg.norm(self.sim.pose[:3] - self.target_pos) * 0.3
+        # reward -= np.linalg.norm(self.sim.v) * 0.09
+        # reward -= np.linalg.norm(self.sim.linear_accel) * 0.027
 
         # reward -= (self.sim.find_body_velocity() ** 2).sum() # velocities must be 0
-        # reward -= abs(self.sim.angular_v).sum() # angular velocities must be 0
-        # reward -= (self.sim.linear_accel ** 2).sum()
-        # reward -= (self.sim.angular_accels ** 2).sum()
-        # reward -= abs(self.sim.pose[:3] - self.target_pos).sum()
+        # reward -= (self.sim.angular_v ** 2).sum() * .005# angular velocities must be 0
+        # reward -= (self.sim.linear_accel ** 2).sum() * .005
+        # reward -= (self.sim.angular_accels ** 2).sum() * .005
+
 
         # reward -= np.std(self.last_rotor_speeds)
 
@@ -50,9 +53,20 @@ class Task():
 
         # dist = np.linalg.norm(np.array(self.sim.pose[:3]) - np.array(self.target_pos))
         # reward = np.tanh(1.0 -.2*(dist))
+
+        # distance_to_target = np.linalg.norm(self.target_pos - self.sim.pose[:3])
+        # acceleration = np.linalg.norm(self.sim.linear_accel)
+
+        # reward = 0#np.linalg.norm(self.target_pos)
+        # reward -= distance_to_target
+        # reward -= acceleration
+        # reward -= angles * 0.3
+
         distance_to_target = np.linalg.norm(self.target_pos - self.sim.pose[:3])
         sum_acceleration = np.linalg.norm(self.sim.linear_accel)
-        reward = - distance_to_target * 0.3 - sum_acceleration * 0.05
+        reward = (5. - distance_to_target) * 0.3 - sum_acceleration * 0.05
+
+
         return reward
 
     def step(self, rotor_speeds):

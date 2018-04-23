@@ -46,6 +46,14 @@ class DDPG():
         self.explore = True
         self.rewards = []
 
+    def save_weights(self, timestamp):
+        self.actor_local.model.save_weights("{}-actor.h5".format(timestamp))
+        self.critic_local.model.save_weights("{}-critic.h5".format(timestamp))
+
+    def load_weights(self, timestamp):
+        self.actor_local.model.load_weights("{}-actor.h5".format(timestamp))
+        self.critic_local.model.load_weights("{}-critic.h5".format(timestamp))
+
     def reset_episode(self, explore=True):
         self.explore = explore
         self.rewards = []
@@ -116,6 +124,9 @@ class DDPG():
     def average_reward(self):
         return np.mean(self.rewards)
 
+    def total_reward(self):
+        return np.sum(self.rewards)
+
 
 class Actor:
     """Actor (Policy) Model."""
@@ -144,31 +155,31 @@ class Actor:
         """Build an actor (policy) network that maps states -> actions."""
         # Define input layer (states)
         states = layers.Input(shape=(self.state_size,), name='states')
-        r = 1. / math.sqrt(self.action_size)
+        r = 0.003
 
         # Add hidden layers
-        net = layers.Dense(units=400, activation='relu', kernel_regularizer=layers.regularizers.l2(0.02), kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(states)
-        net = layers.BatchNormalization()(net)
-        # net = layers.Dropout(.33)(net)
-        net = layers.Dense(units=300, activation='relu', kernel_regularizer=layers.regularizers.l2(0.02), kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net)
-        net = layers.BatchNormalization()(net)
-        # net = layers.Dense(units=32, activation='relu', kernel_regularizer=layers.regularizers.l2(0.02), kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net)
+        net = layers.Dense(units=64, activation='relu',
+            kernel_regularizer=layers.regularizers.l2(0.01),
+            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(states)
         # net = layers.BatchNormalization()(net)
-        # net = layers.Dense(units=64, activation='relu', kernel_regularizer=layers.regularizers.l2(0.02), kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net)
-        # net = layers.BatchNormalization()(net)
-        # net = layers.Dense(units=32, activation='relu', kernel_regularizer=layers.regularizers.l2(0.02), kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net)
-        # net = layers.BatchNormalization()(net)
-        # net = layers.Dropout(.33)(net)
-        # net = layers.Dense(units=128, activation='relu')(net)
-        # net = layers.Dense(units=64, activation='relu')(net)
-        # net = layers.Dense(units=32, activation='relu')(net)
-        # net = layers.Dropout(.33)(net)
+        # net = layers.Dropout(.5)(net)
+
+        net = layers.Dense(units=64, activation='relu',
+            kernel_regularizer=layers.regularizers.l2(0.01),
+            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net)
+
+        net = layers.Dense(units=64, activation='relu',
+            kernel_regularizer=layers.regularizers.l2(0.01),
+            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net)
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
 
         # Add final output layer with sigmoid activation
-        raw_actions = layers.Dense(units=self.action_size, activation='sigmoid',
-            name='raw_actions', kernel_initializer=layers.initializers.RandomUniform(minval=-0.003, maxval=0.003))(net)
+        raw_actions = layers.Dense(units=self.action_size,
+            activation='sigmoid',
+            name='raw_actions',
+            kernel_regularizer=layers.regularizers.l2(0.01),
+            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net)
 
         # Scale [0, 1] output for each action dimension to proper range
         actions = layers.Lambda(lambda x: (x * self.action_range) + self.action_low,
@@ -216,37 +227,39 @@ class Critic:
         # Define input layers
         states = layers.Input(shape=(self.state_size,), name='states')
         actions = layers.Input(shape=(self.action_size,), name='actions')
-
-        r = 1. / math.sqrt(self.action_size)
+        r = 0.003
 
         # Add hidden layer(s) for state pathway
-        net_states = layers.Dense(units=32, activation='relu', kernel_regularizer=layers.regularizers.l2(0.02), kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(states)
-        net_states = layers.BatchNormalization()(net_states)
-        # net_states = layers.Dropout()(net_states)
-        net_states = layers.Dense(units=64, activation='relu', kernel_regularizer=layers.regularizers.l2(0.02), kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net_states)
-        net_states = layers.BatchNormalization()(net_states)
-        # net_states = layers.Dropout()(net_states)
+        net_states = layers.Dense(units=64, activation='relu',
+            kernel_regularizer=layers.regularizers.l2(0.01),
+            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(states)
+
+        net_states = layers.Dense(units=64, activation='relu',
+            kernel_regularizer=layers.regularizers.l2(0.01),
+            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net_states)
 
 
         # Add hidden layer(s) for action pathway
-        net_actions = layers.Dense(units=32, activation='relu', kernel_regularizer=layers.regularizers.l2(0.02), kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(actions)
-        net_actions = layers.BatchNormalization()(net_actions)
-        # net_actions = layers.Dropout()(net_actions)
-        net_actions = layers.Dense(units=64, activation='relu', kernel_regularizer=layers.regularizers.l2(0.02), kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net_actions)
-        net_actions = layers.BatchNormalization()(net_actions)
-        # net_actions = layers.Dropout()(net_actions)
+        net_actions = layers.Dense(units=64, activation='relu',
+            kernel_regularizer=layers.regularizers.l2(0.01),
+            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(actions)
+        net_actions = layers.Dense(units=64, activation='relu',
+            kernel_regularizer=layers.regularizers.l2(0.01),
+            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net_actions)
+
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
 
         # Combine state and action pathways
         net = layers.Add()([net_states, net_actions])
-        # net = layers.Activation('relu')(net)
-        net = layers.Dense(units=32, activation='relu')(net)
+        net = layers.Activation('relu')(net)
 
         # Add more layers to the combined network if needed
 
         # Add final output layer to prduce action values (Q values)
-        Q_values = layers.Dense(units=1, name='q_values', kernel_regularizer=regularizers.l2(0.001), kernel_initializer=layers.initializers.RandomUniform(minval=-0.003, maxval=0.003))(net)
+        Q_values = layers.Dense(units=1, name='q_values',
+            kernel_regularizer=regularizers.l2(0.01),
+            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net)
 
         # Create Keras model
         self.model = models.Model(inputs=[states, actions], outputs=Q_values)
