@@ -222,20 +222,19 @@ class Critic:
         # Add hidden layer(s) for state pathway
         net_states = layers.Dense(units=32, activation='relu', kernel_regularizer=layers.regularizers.l2(0.02), kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(states)
         net_states = layers.BatchNormalization()(net_states)
-        # net_states = layers.Dropout(.33)(net_states)
+        # net_states = layers.Dropout()(net_states)
         net_states = layers.Dense(units=64, activation='relu', kernel_regularizer=layers.regularizers.l2(0.02), kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net_states)
-        # net_states = layers.Dropout(.33)(net_states)
         net_states = layers.BatchNormalization()(net_states)
+        # net_states = layers.Dropout()(net_states)
 
 
         # Add hidden layer(s) for action pathway
         net_actions = layers.Dense(units=32, activation='relu', kernel_regularizer=layers.regularizers.l2(0.02), kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(actions)
         net_actions = layers.BatchNormalization()(net_actions)
-        # net_actions = layers.Dropout(.33)(net_actions)
+        # net_actions = layers.Dropout()(net_actions)
         net_actions = layers.Dense(units=64, activation='relu', kernel_regularizer=layers.regularizers.l2(0.02), kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net_actions)
-        # net_actions = layers.Dropout(.33)(net_actions)
-        # net_actions = layers.BatchNormalization()(net_actions)
-        net_states = layers.BatchNormalization()(net_states)
+        net_actions = layers.BatchNormalization()(net_actions)
+        # net_actions = layers.Dropout()(net_actions)
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
 
