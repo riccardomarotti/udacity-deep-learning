@@ -158,19 +158,35 @@ class Actor:
         r = 0.003
 
         # Add hidden layers
-        net = layers.Dense(units=64, activation='relu',
-            kernel_regularizer=layers.regularizers.l2(0.01),
-            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(states)
+        net = layers.Dense(units=400, activation='relu',
+            # kernel_regularizer=layers.regularizers.l2(0.01),
+            # kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
+            kernel_initializer=layers.initializers.Zeros()
+            )(states)
+        # net = layers.normalization.BatchNormalization()(net)
+        # net = layers.Activation('relu')(net)
         # net = layers.BatchNormalization()(net)
         # net = layers.Dropout(.5)(net)
 
-        net = layers.Dense(units=64, activation='relu',
-            kernel_regularizer=layers.regularizers.l2(0.01),
-            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net)
+        net = layers.Dense(units=300, activation='relu',
+            # kernel_regularizer=layers.regularizers.l2(0.01),
+            # kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
+            kernel_initializer=layers.initializers.Zeros()
+            )(net)
+        # net = layers.normalization.BatchNormalization()(net)
+        # net = layers.Activation('relu')(net)
 
-        net = layers.Dense(units=64, activation='relu',
-            kernel_regularizer=layers.regularizers.l2(0.01),
-            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net)
+        # net = layers.Dense(units=32, activation=None,
+            # kernel_regularizer=layers.regularizers.l2(0.01),
+            # kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
+            # )(net)
+        # net = layers.normalization.BatchNormalization()(net)
+        # net = layers.Activation('relu')(net)
+
+        # net = layers.Dense(units=64, activation='elu',
+            # kernel_regularizer=layers.regularizers.l2(0.01),
+            # kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net)
+
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
 
@@ -179,11 +195,15 @@ class Actor:
             activation='sigmoid',
             name='raw_actions',
             kernel_regularizer=layers.regularizers.l2(0.01),
-            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net)
+            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
+            )(net)
 
         # Scale [0, 1] output for each action dimension to proper range
         actions = layers.Lambda(lambda x: (x * self.action_range) + self.action_low,
             name='actions')(raw_actions)
+
+        # Scale [-1, 1] output for each action dimension to proper range
+        # actions = layers.Lambda(lambda x: ((x/2. + 0.5) * self.action_range) + self.action_low, name='actions')(raw_actions)
 
         # Create Keras model
         self.model = models.Model(inputs=states, outputs=actions)
@@ -230,22 +250,38 @@ class Critic:
         r = 0.003
 
         # Add hidden layer(s) for state pathway
-        net_states = layers.Dense(units=64, activation='relu',
-            kernel_regularizer=layers.regularizers.l2(0.01),
-            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(states)
+        net_states = layers.Dense(units=400, activation='relu',
+            # kernel_regularizer=layers.regularizers.l2(0.01),
+            # kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
+            kernel_initializer=layers.initializers.Zeros()
+            )(states)
+        # net_states = layers.normalization.BatchNormalization()(net_states)
+        # net_states = layers.Activation('relu')(net_states)
 
-        net_states = layers.Dense(units=64, activation='relu',
-            kernel_regularizer=layers.regularizers.l2(0.01),
-            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net_states)
+        net_states = layers.Dense(units=300, activation='relu',
+            # kernel_regularizer=layers.regularizers.l2(0.01),
+            # kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
+            kernel_initializer=layers.initializers.Zeros()
+            )(net_states)
+        # net_states = layers.normalization.BatchNormalization()(net_states)
+        # net_states = layers.Activation('relu')(net_states)
 
 
         # Add hidden layer(s) for action pathway
-        net_actions = layers.Dense(units=64, activation='relu',
-            kernel_regularizer=layers.regularizers.l2(0.01),
-            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(actions)
-        net_actions = layers.Dense(units=64, activation='relu',
-            kernel_regularizer=layers.regularizers.l2(0.01),
-            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net_actions)
+        net_actions = layers.Dense(units=400, activation='relu',
+            # kernel_regularizer=layers.regularizers.l2(0.01),
+            # kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
+            kernel_initializer=layers.initializers.Zeros()
+            )(actions)
+        net_actions = layers.Dense(units=300, activation='relu',
+
+        # net_states = layers.normalization.BatchNormalization()(net_states)
+        # net_states = layers.Activation('relu')(net_states)
+        # net_actions = layers.Dense(units=128, activation='elu',
+            # kernel_regularizer=layers.regularizers.l2(0.01),
+            # kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
+            kernel_initializer=layers.initializers.Zeros()
+            )(net_actions)
 
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
@@ -259,7 +295,9 @@ class Critic:
         # Add final output layer to prduce action values (Q values)
         Q_values = layers.Dense(units=1, name='q_values',
             kernel_regularizer=regularizers.l2(0.01),
-            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r))(net)
+            # kernel_initializer=layers.initializers.Zeros()
+            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
+            )(net)
 
         # Create Keras model
         self.model = models.Model(inputs=[states, actions], outputs=Q_values)

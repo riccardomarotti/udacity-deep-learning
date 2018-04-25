@@ -23,8 +23,8 @@ class Task():
         self.action_repeat = 3
 
         self.state_size = self.action_repeat * 6
-        self.action_low = 400
-        self.action_high = 500
+        self.action_low = 0
+        self.action_high = 900
         self.action_size = 4
 
         self.last_rotor_speeds = []
@@ -62,25 +62,32 @@ class Task():
         # reward -= acceleration
         # reward -= angles * 0.3
 
-        distance_z = np.linalg.norm(self.target_pos[2] - self.sim.pose[2])
-        distance_xy = np.linalg.norm(self.target_pos[:2] - self.sim.pose[:2])
+        # distance_z = np.linalg.norm(self.target_pos[2] - self.sim.pose[2])
+        # distance_xy = np.linalg.norm(self.target_pos[:2] - self.sim.pose[:2])
 
-        acceleration_z = np.linalg.norm(self.sim.linear_accel[2])
-        acceleration_xy = np.linalg.norm(self.sim.linear_accel[:2])
+        acceleration = np.linalg.norm(self.sim.linear_accel)
+        # acceleration_z = np.linalg.norm(self.sim.linear_accel[2])
+        # acceleration_xy = np.linalg.norm(self.sim.linear_accel[:2])
 
-        # speed = np.linalg.norm(self.sim.v)
+        # # speed = np.linalg.norm(self.sim.v)
         speed = np.linalg.norm(self.sim.find_body_velocity())
-        speed_z = np.linalg.norm(self.sim.v[2])
+        distance = np.linalg.norm(self.target_pos - self.sim.pose[:3])
+        # speed_z = np.linalg.norm(self.sim.v[2])
 
         # reward = - (np.linalg.norm(self.target_pos[2]) - distance_z) / np.linalg.norm(self.target_pos[2]) - acceleration_z / 25.
         # reward1 = 1. - 2. * math.tanh(speed_z)
         # reward2 = 1. - 2. * math.tanh(speed)
         # reward = reward1 * 0.7 + reward2 * 0.3
+        MAX_SPEED = 28.
+        MAX_ACCELERATION = 39.
+        # reward = 1. - 2. * math.tanh(((speed / MAX_SPEED) + (acceleration / MAX_ACCELERATION)) * 2)
+        speed_reward = speed / MAX_SPEED
+        distance_reward = distance / np.linalg.norm(self.target_pos)
+        acceleration_reward = acceleration / MAX_ACCELERATION
 
-        reward = 1. - 2. * math.tanh(speed)
-        # reward_xy = - (np.linalg.norm(self.target_pos[:2]) - distance_xy) / np.linalg.norm(self.target_pos[:2]) - acceleration_xy / 25.
+        reward = 1. - 2. * math.tanh(speed_reward + distance_reward + acceleration_reward)
 
-        return reward / self.action_repeat
+        return reward
 
     def step(self, rotor_speeds):
         """Uses action to obtain next state, reward, done."""
