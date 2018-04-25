@@ -67,6 +67,11 @@ class PhysicsSim():
 
     def get_linear_drag(self):
         linear_drag = 0.5 * self.rho * self.find_body_velocity()**2 * self.areas * self.C_d
+
+        for i in range(3):
+            if (self.v[i] > 0):
+                linear_drag[i] *= (-1)
+
         return linear_drag
 
     def get_linear_forces(self, thrusts):
@@ -75,7 +80,8 @@ class PhysicsSim():
         # Thrust
         thrust_body_force = np.array([0, 0, sum(thrusts)])
         # Drag
-        drag_body_force = -self.get_linear_drag()
+        # drag_body_force = -self.get_linear_drag()
+        drag_body_force = self.get_linear_drag()
         body_forces = thrust_body_force + drag_body_force
 
         linear_forces = np.matmul(body_to_earth_frame(*list(self.pose[3:])), body_forces)
@@ -111,7 +117,7 @@ class PhysicsSim():
             V = self.prop_wind_speed[prop_number]
             D = self.propeller_size
             n = rotor_speeds[prop_number]
-            J = V / n * D
+            J = V / (n * D)
             # From http://m-selig.ae.illinois.edu/pubs/BrandtSelig-2011-AIAA-2011-1255-LRN-Propellers.pdf
             C_T = max(.12 - .07*max(0, J)-.1*max(0, J)**2, 0)
             thrusts.append(C_T * self.rho * n**2 * D**4)
