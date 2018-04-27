@@ -20,11 +20,11 @@ class Task():
         """
         # Simulation
         self.sim = PhysicsSim(init_pose, init_velocities, init_angle_velocities, runtime)
-        self.action_repeat = 1
+        self.action_repeat = 3
 
         self.state_size = self.action_repeat * 6
-        self.action_low = 0
-        self.action_high = 900
+        self.action_low = 300
+        self.action_high = 600
         self.action_size = 4
 
         self.last_rotor_speeds = []
@@ -46,11 +46,15 @@ class Task():
         distance_reward = distance / np.linalg.norm(self.target_pos)
         acceleration_reward = acceleration / MAX_ACCELERATION
         crash_reward = 0.
+        rotors_speed_reward = abs(810. - np.linalg.norm(self.last_rotor_speeds)) / 810.
+
         if self.sim.pose[2] < self.target_pos[2] / 2.:
             crash_reward = 1
 
         # reward = 1. - 2. * math.tanh(speed_reward + distance_reward + acceleration_reward + crash_reward)
+        # reward = 1. - 2. * math.tanh(speed_reward + acceleration_reward + rotors_speed_reward)
         reward = 1. - 2. * math.tanh(speed_reward + acceleration_reward)
+        # reward = - math.log(speed + acceleration)
 
         return reward
 

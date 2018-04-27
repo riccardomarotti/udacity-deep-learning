@@ -270,7 +270,7 @@ class Critic:
         # Add hidden layer(s) for action pathway
         net_actions = layers.Dense(units=400, activation='relu',
             kernel_regularizer=layers.regularizers.l2(0.01),
-            kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
+            # kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
             # kernel_initializer=layers.initializers.Zeros()
             )(actions)
         # net_actions = layers.Dense(units=300, activation='relu',

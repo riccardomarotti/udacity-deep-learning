@@ -68,9 +68,9 @@ class PhysicsSim():
     def get_linear_drag(self):
         linear_drag = 0.5 * self.rho * self.find_body_velocity()**2 * self.areas * self.C_d
 
-        for i in range(3):
-            if (self.v[i] > 0):
-                linear_drag[i] *= (-1)
+        # for i in range(3):
+        #     if (self.v[i] > 0):
+        #         linear_drag[i] *= (-1)
 
         return linear_drag
 
@@ -80,8 +80,8 @@ class PhysicsSim():
         # Thrust
         thrust_body_force = np.array([0, 0, sum(thrusts)])
         # Drag
-        # drag_body_force = -self.get_linear_drag()
-        drag_body_force = self.get_linear_drag()
+        drag_body_force = -self.get_linear_drag()
+        # drag_body_force = self.get_linear_drag()
         body_forces = thrust_body_force + drag_body_force
 
         linear_forces = np.matmul(body_to_earth_frame(*list(self.pose[3:])), body_forces)
