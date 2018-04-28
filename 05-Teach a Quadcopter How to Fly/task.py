@@ -24,7 +24,7 @@ class Task():
 
         self.state_size = self.action_repeat * 6
         self.action_low = 300
-        self.action_high = 600
+        self.action_high = 900
         self.action_size = 4
 
         self.last_rotor_speeds = []
@@ -37,6 +37,7 @@ class Task():
 
         MAX_SPEED = 28.
         MAX_ACCELERATION = 39.
+        MAX_VARIANCE = 80000.
 
         acceleration = np.linalg.norm(self.sim.linear_accel)
         speed = np.linalg.norm(self.sim.find_body_velocity())
@@ -47,14 +48,15 @@ class Task():
         acceleration_reward = acceleration / MAX_ACCELERATION
         crash_reward = 0.
         rotors_speed_reward = abs(810. - np.linalg.norm(self.last_rotor_speeds)) / 810.
+        rotors_variance_reward = np.var(self.last_rotor_speeds) / MAX_VARIANCE
 
         if self.sim.pose[2] < self.target_pos[2] / 2.:
             crash_reward = 1
 
-        # reward = 1. - 2. * math.tanh(speed_reward + distance_reward + acceleration_reward + crash_reward)
+        # reward = 1. - 2. * math.tanh(speed_reward + distance_reward)
         # reward = 1. - 2. * math.tanh(speed_reward + acceleration_reward + rotors_speed_reward)
-        reward = 1. - 2. * math.tanh(speed_reward + acceleration_reward)
-        # reward = - math.log(speed + acceleration)
+        reward = 1. - 2. * math.tanh(speed_reward + rotors_speed_reward + rotors_variance_reward)
+        # reward = - math.log(distance)
 
         return reward
 
