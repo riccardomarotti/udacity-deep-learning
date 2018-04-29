@@ -157,7 +157,7 @@ class Actor:
         states = layers.Input(shape=(self.state_size,), name='states')
 
         # Add hidden layers
-        net = layers.Dense(units=400, activation='relu',
+        net = layers.Dense(units=300, activation='relu',
             kernel_regularizer=layers.regularizers.l2(0.01),
             # kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
             # kernel_initializer=layers.initializers.Zeros()
@@ -167,7 +167,7 @@ class Actor:
         # net = layers.BatchNormalization()(net)
         # net = layers.Dropout(.5)(net)
 
-        net = layers.Dense(units=300, activation='relu',
+        net = layers.Dense(units=400, activation='relu',
             kernel_regularizer=layers.regularizers.l2(0.01),
             # kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
             # kernel_initializer=layers.initializers.Zeros()
@@ -192,18 +192,20 @@ class Actor:
 
         # Add final output layer with sigmoid activation
         raw_actions = layers.Dense(units=self.action_size,
-            activation='sigmoid',
+            activation='tanh',
             name='raw_actions',
             kernel_regularizer=layers.regularizers.l2(0.01),
             kernel_initializer=layers.initializers.RandomUniform(minval=-r, maxval=r)
+            # kernel_initializer=layers.initializers.Ones()
             )(net)
 
         # Scale [0, 1] output for each action dimension to proper range
-        actions = layers.Lambda(lambda x: (x * self.action_range) + self.action_low,
-            name='actions')(raw_actions)
+        # actions = layers.Lambda(lambda x: (x * self.action_range) + self.action_low,
+        #     name='actions')(raw_actions)
 
         # Scale [-1, 1] output for each action dimension to proper range
-        # actions = layers.Lambda(lambda x: ((x/2. + 0.5) * self.action_range) + self.action_low, name='actions')(raw_actions)
+        actions = layers.Lambda(lambda x: ((x + 1.) *.5 * self.action_range) + self.action_low,
+              name='actions')(raw_actions)
 
         # Create Keras model
         self.model = models.Model(inputs=states, outputs=actions)
