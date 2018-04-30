@@ -23,40 +23,22 @@ class Task():
         self.action_repeat = 3
 
         self.state_size = self.action_repeat * 6
-        self.action_low = 300
-        self.action_high = 900
         self.action_size = 4
+        self.action_low = 0
+        self.action_high = 900
 
         self.last_rotor_speeds = []
         # Goal
         self.target_pos = target_pos if target_pos is not None else np.array([0., 0., 0.])
+        self.start_pos = np.linalg.norm(init_pose[:3])
 
 
     def get_reward(self):
         """Uses current pose of sim to return reward."""
-
-        MAX_SPEED = 28.
-        MAX_ACCELERATION = 39.
-        MAX_VARIANCE = 80000.
-
-        acceleration = np.linalg.norm(self.sim.linear_accel)
-        speed = np.linalg.norm(self.sim.find_body_velocity())
-        distance = np.linalg.norm(self.target_pos - self.sim.pose[:3])
-
-        speed_reward = speed / MAX_SPEED
-        distance_reward = distance / np.linalg.norm(self.target_pos)
-        acceleration_reward = acceleration / MAX_ACCELERATION
-        crash_reward = 0.
-        rotors_speed_reward = abs(810. - np.linalg.norm(self.last_rotor_speeds)) / 810.
-        rotors_variance_reward = np.var(self.last_rotor_speeds) / MAX_VARIANCE
-
-        if self.sim.pose[2] < self.target_pos[2] / 2.:
-            crash_reward = 1
-
-        # reward = 1. - 2. * math.tanh(speed_reward + distance_reward)
-        # reward = 1. - 2. * math.tanh(speed_reward + acceleration_reward + rotors_speed_reward)
-        reward = 1. - 2. * math.tanh(speed_reward + rotors_speed_reward + rotors_variance_reward)
-        # reward = - math.log(distance)
+        reward = 0
+        reward += math.tanh(self.sim.v[2])
+        reward -= math.tanh(abs(self.sim.v[:2]).sum())
+        reward += math.tanh(self.sim.pose[2])
 
         return reward
 
@@ -66,7 +48,8 @@ class Task():
         reward = 0
         pose_all = []
         for _ in range(self.action_repeat):
-            done = self.sim.next_timestep(rotor_speeds) or self.sim.pose[2] <= 0.
+            target_reached = self.target_pos[2] <= self.sim.pose[2]
+            done = self.sim.next_timestep(rotor_speeds) or self.sim.pose[2] <= 0. or target_reached
             reward += self.get_reward()
             pose_all.append(self.sim.pose)
         next_state = np.concatenate(pose_all)
